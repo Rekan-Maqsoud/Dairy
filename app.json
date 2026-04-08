@@ -25,7 +25,11 @@
       "predictiveBackGestureEnabled": false
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "bundler": "webpack",
+      "build": {
+        "output": "web-build"
+      }
     },
     "plugins": [
       "expo-web-browser"
