@@ -6,13 +6,21 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "appwrite:setup": "node ./scripts/setup-appwrite.mjs"
   },
   "dependencies": {
+    "dotenv": "^17.3.1",
     "expo": "~54.0.33",
+    "expo-linking": "~8.0.11",
     "expo-status-bar": "~3.0.9",
+    "expo-web-browser": "~15.0.10",
+    "node-appwrite": "^23.1.0",
     "react": "19.1.0",
-    "react-native": "0.81.5"
+    "react-dom": "^19.1.0",
+    "react-native": "0.81.5",
+    "react-native-appwrite": "^0.27.1",
+    "react-native-web": "^0.21.2"
   },
   "devDependencies": {
     "@types/react": "~19.1.0",
