@@ -427,7 +427,7 @@ export async function signInWithGoogle(): Promise<AuthUser> {
   const authResult = await WebBrowser.openAuthSessionAsync(authUrl, redirectUrl);
   if (authResult.type !== 'success' || !authResult.url) {
     setOAuthPending(false);
-    throw new Error('Google sign-in was canceled or did not finish.');
+    throw new Error('Google sign-in was canceled or diddd not finish.');
   }
 
   const { userId, secret } = readSessionTokenFromCallback(authResult.url);
