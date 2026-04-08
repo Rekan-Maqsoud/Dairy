@@ -12,7 +12,6 @@
     "appwrite:setup": "node ./scripts/setup-appwrite.mjs"
   },
   "dependencies": {
-    "@expo/webpack-config": "^19.0.1",
     "dotenv": "^17.3.1",
     "expo": "~54.0.33",
     "expo-linking": "~8.0.11",
@@ -27,7 +26,7 @@
   },
   "devDependencies": {
     "@types/react": "~19.1.0",
-    "babel-preset-expo": "^55.0.16",
+    "babel-preset-expo": "^54.0.0",
     "typescript": "~5.9.2"
   },
   "private": true
