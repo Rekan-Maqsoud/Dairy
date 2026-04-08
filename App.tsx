@@ -12,6 +12,7 @@ import {
   Text,
   TextInput,
   View,
+  Alert,
 } from 'react-native';
 import {
   appwriteConfigError,
@@ -22,6 +23,7 @@ import {
   signInAnonymously,
   signInWithGoogle,
   signOutCurrentUser,
+  deleteDiaryEntry,
   type AuthUser,
   type DiaryEntry,
 } from './src/services/appwriteDiary';
@@ -65,6 +67,7 @@ function AppContent() {
   const [historyStatus, setHistoryStatus] = useState<'loading' | 'ready' | 'failed'>('loading');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isAuthBusy, setIsAuthBusy] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const isConfigValid = appwriteConfigError === null;
   const displayedEntries = useMemo(
@@ -218,6 +221,40 @@ function AppContent() {
       setErrorMessage(getDiaryErrorMessage(error));
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteEntry = async (id: string, previewText?: string) => {
+    if (historyStatus === 'loading' || isAuthBusy || !isConfigValid) {
+      return;
+    }
+
+    const confirmDelete = Platform.OS === 'web'
+      ? window.confirm('Delete this memory? This action cannot be undone.')
+      : await new Promise<boolean>((resolve) => {
+          Alert.alert(
+            'Delete memory',
+            'Delete this memory? This action cannot be undone.',
+            [
+              { text: 'Cancel', style: 'cancel', onPress: () => resolve(false) },
+              { text: 'Delete', style: 'destructive', onPress: () => resolve(true) },
+            ],
+          );
+        });
+
+    if (!confirmDelete) {
+      return;
+    }
+
+    try {
+      setDeletingId(id);
+      await deleteDiaryEntry(id);
+      setEntries((prev) => prev.filter((e) => e.id !== id));
+      setErrorMessage(null);
+    } catch (error) {
+      setErrorMessage(getDiaryErrorMessage(error));
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -416,6 +453,19 @@ function AppContent() {
                   <Text style={[styles.entryDate, { color: theme.colors.muted }]}>
                     {item.formattedCreatedAt}
                   </Text>
+                  <Pressable
+                    onPress={() => void handleDeleteEntry(item.id, item.text)}
+                    disabled={deletingId === item.id || isAuthBusy || !isConfigValid}
+                    accessibilityRole="button"
+                    accessibilityLabel="Delete diary entry"
+                    style={({ pressed }) => [
+                      styles.deleteButton,
+                      pressed ? styles.addButtonPressed : null,
+                      deletingId === item.id ? styles.addButtonDisabled : null,
+                    ]}
+                  >
+                    <Text style={[styles.deleteButtonText, { color: theme.colors.dangerText ?? '#b00020' }]}>Delete</Text>
+                  </Pressable>
                 </View>
               )}
               ListEmptyComponent={
@@ -661,5 +711,17 @@ const styles = StyleSheet.create({
     marginTop: 8,
     fontSize: 12,
     fontFamily: monoFont,
+  },
+  deleteButton: {
+    marginTop: 10,
+    alignSelf: 'flex-start',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 10,
+  },
+  deleteButtonText: {
+    fontSize: 13,
+    fontWeight: '700',
+    fontFamily: bodyFont,
   },
 });

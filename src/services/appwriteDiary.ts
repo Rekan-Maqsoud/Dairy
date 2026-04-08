@@ -511,6 +511,17 @@ export async function createDiaryEntry(text: string): Promise<DiaryEntry> {
   return createdEntry;
 }
 
+export async function deleteDiaryEntry(id: string): Promise<void> {
+  if (appwriteConfigError) {
+    throw new Error(appwriteConfigError);
+  }
+
+  // Ensure user is signed in so permission checks are valid.
+  await ensureSignedInUser();
+
+  await databases.deleteDocument(databaseId!, collectionId!, id);
+}
+
 export function getDiaryErrorMessage(error: unknown): string {
   if (error instanceof Error) {
     const normalizedMessage = error.message.toLowerCase();
